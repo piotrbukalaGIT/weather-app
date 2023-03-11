@@ -5,6 +5,9 @@ const hbs = require('hbs')
 const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
 
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
 const app = express()
 
 // Define paths for Express config
@@ -19,6 +22,18 @@ hbs.registerPartials(partialsPath)
 
 // Setup static directory to serve
 app.use(express.static(publicDirectoryPath))
+
+
+// AWS EB
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
 
 app.get('', (req, res) => {
     res.render('index', {
@@ -70,13 +85,6 @@ app.get('/weather', (req, res) => {
     })
 })
 
-  
-  // console.log(req.query)
-  //   res.send({
-  //       forecast: forecastData,
-  //       location: location,
-  //       address: req.query.address
-  //   })
 })
 
 app.get('/help/*', (req, res) => {
@@ -98,3 +106,5 @@ app.get('*', (req, res) => {
 app.listen(3000, () => {
     console.log('Server is up on port 3000.')
 })
+
+module.exports = app;
